@@ -8,7 +8,7 @@ const MATRIX_WIDTH = 20;
 const MATRIX_HEIGHT = 20;
 const matrix = [];
 const DEFAULT_COLOR = 'black';
-const COLOR_LIST = ['red', 'blue', 'green', 'purple', 'yellow'];
+const COLOR_LIST = ['red', 'blue', 'green', 'yellow'];
 
 let STARTED = false;
 let NB_PLAYER = 1;
@@ -44,22 +44,6 @@ const initGame = () => {
 initGame();
 
 /**
- * Is there at least one other {color} in the row or columns
- * @param {*} iTest
- * @param {*} jTest
- * @param {*} color
- */
-const searchOnLines = (iTest , jTest , color) => {
-  for (var i = 0; i < MATRIX_HEIGHT; i++) {
-    if(matrix[i][jTest] === color) return true;
-  }
-  for (var j = 0; j < MATRIX_WIDTH; j++) {
-    if(matrix[iTest][j] === color) return true;
-  }
-  return false;
-}
-
-/**
  * fillWithColor
  * @param {*} iTest
  * @param {*} jTest
@@ -72,6 +56,10 @@ const fillWithColor = (iTest, jTest, color) => {
   var foundAfterInRow = false;
   const foundAfterInRowList = [];
   for (var i = (iTest + 1); i < MATRIX_HEIGHT; i++) {
+    if(matrix[i][jTest] === DEFAULT_COLOR) {
+      foundAfterInRow = false;
+      break;
+    }
     if(matrix[i][jTest] === color) {
       foundAfterInRow = true;
       break;
@@ -85,6 +73,10 @@ const fillWithColor = (iTest, jTest, color) => {
   var foundBeforeInRow = false;
   const foundBeforeInRowList = [];
   for (var i = (iTest - 1); i >= 0; i--) {
+    if(matrix[i][jTest] === DEFAULT_COLOR) {
+      foundBeforeInRow = false;
+      break;
+    }
     if(matrix[i][jTest] === color) {
       foundBeforeInRow = true;
       break;
@@ -98,6 +90,10 @@ const fillWithColor = (iTest, jTest, color) => {
   var foundAfterInCol = false;
   const foundAfterInColList = [];
   for (var j = (jTest + 1); j < MATRIX_WIDTH; j++) {
+    if(matrix[iTest][j] === DEFAULT_COLOR) {
+      foundAfterInCol = false;
+      break;
+    }
     if(matrix[iTest][j] === color) {
       foundAfterInCol = true;
       break;
@@ -111,6 +107,10 @@ const fillWithColor = (iTest, jTest, color) => {
   var foundBeforeInCol = false;
   const foundBeforeInColList = [];
   for (var j = (jTest - 1); j >= 0; j--) {
+    if(matrix[iTest][j] === DEFAULT_COLOR) {
+      foundBeforeInCol = false;
+      break;
+    }
     if(matrix[iTest][j] === color) {
       foundBeforeInCol = true;
       break;
@@ -189,8 +189,13 @@ const play = ({ req, res, i, j, color }) => {
     return;
   }
 
-  if(!searchOnLines(iInt, jInt, color)) {
-    emitError(req, res, 'NO_OTHER_SAME_COLOR');
+  if(
+    (iInt === 0 || matrix[iInt-1][jInt] === DEFAULT_COLOR)
+    && (iInt === MATRIX_HEIGHT-1 || matrix[iInt+1][jInt] === DEFAULT_COLOR)
+    && (jInt === 0 || matrix[iInt][jInt-1] === DEFAULT_COLOR)
+    && (jInt === MATRIX_WIDTH-1 || matrix[iInt][jInt+1] === DEFAULT_COLOR)
+  ) {
+    emitError(req, res, 'NO_OTHER_AROUND');
     return;
   }
 
@@ -223,20 +228,41 @@ app.get('/start/:nb', (req, res) => {
     emitError(req, res, 'MISSING_PARAMS');
     return;
   }
-  if(parseInt(nb, 10) > 5) {
-    emitError(req, res, 'TOO_MANY_PLAYERS');
+  if(parseInt(nb, 10) > COLOR_LIST.length || parseInt(nb, 10) < 2) {
+    emitError(req, res, 'IMPOSSIBLE_NB_PLAYERS');
     return;
   }
   console.log(`[START] ${nb} players`);
   initGame();
 
+  /*
   for (var i = 0; i < nb; i++) {
     // 2 cases per player
     randomOnMatrix(COLOR_LIST[i])
     randomOnMatrix(COLOR_LIST[i])
   }
+  */
+  const nbInt = parseInt(nb, 10);
+  matrix[9][9] = COLOR_LIST[0]
+  matrix[8][8] = COLOR_LIST[0]
+  matrix[7][7] = COLOR_LIST[0]
+  matrix[10][10] = COLOR_LIST[1]
+  matrix[11][11] = COLOR_LIST[1]
+  matrix[12][12] = COLOR_LIST[1]
+  if(nbInt > 2) {
+    matrix[9][10] = COLOR_LIST[2]
+    matrix[8][11] = COLOR_LIST[2]
+    matrix[7][12] = COLOR_LIST[2]
+  }
+  if(nbInt > 3) {
+    matrix[10][9] = COLOR_LIST[3]
+    matrix[11][8] = COLOR_LIST[3]
+    matrix[12][7] = COLOR_LIST[3]
+  }
+
+
   STARTED = true;
-  NB_PLAYER = parseInt(nb, 10);
+  NB_PLAYER = nbInt;
   emitOK(req, res);
 })
 
