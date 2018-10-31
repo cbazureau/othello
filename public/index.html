@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Tuto Game</title>
+    <script src="socket.io.js"></script>
+    <style>
+      body {
+        background: #eee;
+        font-size: 10px;
+      }
+      #container {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        margin: 20px 0;
+      }
+      #log {
+        width: 300px;
+        height: 521px;
+        overflow: hidden;
+        background: white;
+        padding: 5px;
+        font-size: 0.9rem;
+      }
+      #log .success {
+        color: green;
+      }
+      #log .error {
+        color: red;
+      }
+      #gameboard table {
+        table-layout: fixed;
+        border: 0;
+        border-spacing: 1px;
+      }
+      #gameboard table td {
+        width: 25px;
+        height: 25px;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <script>
+      function start() {
+        document.getElementById('log').innerHTML = "";
+        fetch('/start/3');
+      }
+      function addAction({ errorName, uri }) {
+        const div = document.createElement('div');
+        if(errorName === 'OK') {
+          div.innerHTML = `${uri}`;
+          div.className = 'success';
+        } else {
+          div.innerHTML = `${uri} - ${errorName}`;
+          div.className = 'error';
+        }
+        document.getElementById('log').appendChild(div);
+      }
+      function reloadTable({ matrix, uri }) {
+        if(uri) addAction({
+          errorName: 'OK',
+          uri,
+        })
+        document.getElementById('gameboard').innerHTML = "";
+        const table = document.createElement('table');
+        document.getElementById('gameboard').appendChild(table);
+        for (var i = 0; i < matrix.length; i++) {
+            var tr = document.createElement('tr');
+            table.appendChild(tr);
+            for (var j = 0; j < matrix[i].length; j++) {
+                var tdElement = document.createElement('td');
+                tdElement.innerHTML = '&nbsp;';
+                tdElement.bgColor = matrix[i][j];
+                tdElement.setAttribute('url', `./play/red/${i}/${j}`)
+                tdElement.onclick = function () { fetch(this.getAttribute('url')) };
+                tr.appendChild(tdElement);
+            }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <button onClick="start()">Start</button>
+    <div id="container">
+      <div id="gameboard"></div>
+      <div id="log"></div>
+    </div>
+    <script>
+      const socket = io('http://localhost:3005')
+      socket.on('refresh', reloadTable)
+      socket.on('error', addAction)
+      socket.emit('change color', 'red')
+    </script>
+  </body>
+</html>
