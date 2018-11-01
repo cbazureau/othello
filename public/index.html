@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Tuto Game</title>
+    <title>Reversi Game</title>
     <script src="socket.io.js"></script>
     <style>
       body {
@@ -15,8 +15,8 @@
       }
       #log {
         width: 300px;
-        height: 521px;
-        overflow: hidden;
+        height: 478px;
+        overflow-y: scroll;
         background: white;
         padding: 5px;
         font-size: 0.9rem;
@@ -33,16 +33,34 @@
         border-spacing: 1px;
       }
       #gameboard table td {
-        width: 25px;
-        height: 25px;
+        width: 60px;
+        height: 60px;
         padding: 0;
         margin: 0;
+        position: relative;
       }
+      .piece {
+        display: block;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate3d(-50%, -50%, 0);
+      }
+      .piece-white {
+        background: white;
+      }
+      .piece-black {
+        background: black;
+      }
+
     </style>
     <script>
       function start() {
         document.getElementById('log').innerHTML = "";
-        fetch('/start/3');
+        fetch('/start');
       }
       function addAction({ errorName, uri }) {
         const div = document.createElement('div');
@@ -54,8 +72,9 @@
           div.className = 'error';
         }
         document.getElementById('log').appendChild(div);
+        document.getElementById('log').scrollTo(0,document.getElementById('log').scrollHeight);
       }
-      function reloadTable({ matrix, uri }) {
+      function reloadTable({ matrix, uri, next }) {
         if(uri) addAction({
           errorName: 'OK',
           uri,
@@ -68,11 +87,20 @@
             table.appendChild(tr);
             for (var j = 0; j < matrix[i].length; j++) {
                 var tdElement = document.createElement('td');
-                tdElement.innerHTML = '&nbsp;';
-                tdElement.bgColor = matrix[i][j];
-                tdElement.setAttribute('url', `./play/red/${i}/${j}`)
-                tdElement.onclick = function () { fetch(this.getAttribute('url')) };
+                tdElement.bgColor = 'green';
+                tdElement.setAttribute('url', `./play/${next}/${i}/${j}`)
+                tdElement.onclick = function () {
+                  fetch(this.getAttribute('url'))
+                };
                 tr.appendChild(tdElement);
+                if(matrix[i][j] === 'green') {
+                  tdElement.innerHTML = '&nbsp;';
+                } else {
+                  var span = document.createElement('span');
+                  span.className = `piece piece-${matrix[i][j]}`;
+                  tdElement.appendChild(span);
+                }
+
             }
         }
       }
