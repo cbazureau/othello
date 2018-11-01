@@ -15,10 +15,12 @@
       }
       #log {
         width: 300px;
-        height: 478px;
+        height: 497px;
         overflow-y: scroll;
         background: white;
         padding: 5px;
+        margin-left: 20px;
+        border: 1px solid gray;
         font-size: 0.9rem;
       }
       #log .success {
@@ -29,7 +31,7 @@
       }
       #gameboard table {
         table-layout: fixed;
-        border: 0;
+        border: 10px solid brown;
         border-spacing: 1px;
       }
       #gameboard table td {
@@ -47,6 +49,8 @@
         position: absolute;
         top: 50%;
         left: 50%;
+        background: transparent;
+        transition: background-color 0.5s;
         transform: translate3d(-50%, -50%, 0);
       }
       .piece-white {
@@ -58,10 +62,15 @@
 
     </style>
     <script>
+      var TABLE_LOADED = false;
+
+      // Start
       function start() {
         document.getElementById('log').innerHTML = "";
         fetch('/start');
       }
+
+      // Add action in log Panel
       function addAction({ errorName, uri }) {
         const div = document.createElement('div');
         if(errorName === 'OK') {
@@ -74,35 +83,47 @@
         document.getElementById('log').appendChild(div);
         document.getElementById('log').scrollTo(0,document.getElementById('log').scrollHeight);
       }
+      // reloadTable
       function reloadTable({ matrix, uri, next }) {
         if(uri) addAction({
           errorName: 'OK',
           uri,
         })
-        document.getElementById('gameboard').innerHTML = "";
-        const table = document.createElement('table');
-        document.getElementById('gameboard').appendChild(table);
-        for (var i = 0; i < matrix.length; i++) {
+        if(!TABLE_LOADED) {
+          document.getElementById('gameboard').innerHTML = "";
+          const table = document.createElement('table');
+          document.getElementById('gameboard').appendChild(table);
+          for (var i = 0; i < matrix.length; i++) {
             var tr = document.createElement('tr');
             table.appendChild(tr);
             for (var j = 0; j < matrix[i].length; j++) {
-                var tdElement = document.createElement('td');
-                tdElement.bgColor = 'green';
-                tdElement.setAttribute('url', `./play/${next}/${i}/${j}`)
-                tdElement.onclick = function () {
-                  fetch(this.getAttribute('url'))
-                };
-                tr.appendChild(tdElement);
-                if(matrix[i][j] === 'green') {
-                  tdElement.innerHTML = '&nbsp;';
-                } else {
-                  var span = document.createElement('span');
-                  span.className = `piece piece-${matrix[i][j]}`;
-                  tdElement.appendChild(span);
-                }
-
+              var tdElement = document.createElement('td');
+              tdElement.bgColor = 'green';
+              tr.appendChild(tdElement);
+              var span = document.createElement('span');
+              span.setAttribute('url', `./play/${next}/${i}/${j}`)
+              span.onclick = function () {
+                fetch(this.getAttribute('url'))
+              };
+              span.className = `piece piece-${matrix[i][j]} pos-${i}-${j}`;
+              tdElement.appendChild(span);
             }
+          }
         }
+
+        for (var i = 0; i < matrix.length; i++) {
+          for (var j = 0; j < matrix[i].length; j++) {
+            var elem = document.getElementsByClassName(`pos-${i}-${j}`)[0];
+            elem.setAttribute('url', `./play/${next}/${i}/${j}`);
+            if(!elem.classList.contains(`piece-${matrix[i][j]}`)) {
+              if(matrix[i][j] === 'white' || matrix[i][j] === 'green') elem.classList.remove(`piece-black`);
+              if(matrix[i][j] === 'black' || matrix[i][j] === 'green') elem.classList.remove(`piece-white`);
+              if(matrix[i][j] !== 'green') elem.classList.add(`piece-${matrix[i][j]}`)
+            }
+          }
+        }
+
+        TABLE_LOADED = true;
       }
     </script>
   </head>
