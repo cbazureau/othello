@@ -15,6 +15,8 @@ const {
 let matrix = [];
 let STARTED = false;
 let NEXT_PLAYER = COLOR_LIST[0];
+let PASS = 0;
+const COUNTER = {};
 
 /**
  * initGame
@@ -31,6 +33,8 @@ const initGame = () => {
 	matrix[3][4] = COLOR_LIST[1];
 	matrix[4][4] = COLOR_LIST[0];
 	matrix[4][3] = COLOR_LIST[1];
+	COUNTER[COLOR_LIST[0]] = 2;
+	COUNTER[COLOR_LIST[1]] = 2;
 	STARTED = true;
 	NEXT_PLAYER = COLOR_LIST[0];
 };
@@ -44,12 +48,21 @@ const initGame = () => {
 const emitRefresh = (req, res, status) => {
 	const uri = req ? req.url : '';
 	const next = NEXT_PLAYER;
+
+	const total = COUNTER.black + COUNTER.white;
+	if (PASS === 2 || total === 64) {
+		if (COUNTER.black > COUNTER.white) status = STATUS.BLACK_VICTORY;
+		if (COUNTER.white > COUNTER.black) status = STATUS.WHITE_VICTORY;
+		if (COUNTER.white === COUNTER.black) status = STATUS.DRAW;
+	}
 	const result = {
 		matrix,
 		uri,
 		status: status || STATUS.OK,
 		next,
 		playablePlaces: playablePlaces(matrix, next),
+		counter: COUNTER,
+		pass: PASS,
 	};
 	io.sockets.emit('refresh', result);
 	if (res && req) res.send(result);
@@ -68,6 +81,7 @@ const pass = ({ req, res, color }) => {
 		emitRefresh(req, res, STATUS.YOU_CANNOT_PASS);
 		return;
 	}
+	PASS++;
 	NEXT_PLAYER = getOppositeColor(color);
 	emitRefresh(req, res, STATUS.OK);
 };
@@ -109,6 +123,9 @@ const play = ({ req, res, i, j, color }) => {
 	matrix[iInt][jInt] = color;
 	estimation.results.forEach((p) => (matrix[p[0]][p[1]] = color));
 	NEXT_PLAYER = getOppositeColor(color);
+	COUNTER[color] = COUNTER[color] + estimation.results.length + 1;
+	COUNTER[NEXT_PLAYER] = COUNTER[NEXT_PLAYER] - estimation.results.length;
+	PASS = 0;
 
 	emitRefresh(req, res, STATUS.OK);
 };

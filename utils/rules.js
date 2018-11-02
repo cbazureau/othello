@@ -11,6 +11,9 @@ const STATUS = {
 	NOT_STARTED: 'NOT_STARTED',
 	MISSING_PARAMS: 'MISSING_PARAMS',
 	YOU_CANNOT_PASS: 'YOU_CANNOT_PASS',
+	WHITE_VICTORY: 'WHITE_VICTORY',
+	BLACK_VICTORY: 'BLACK_VICTORY',
+	DRAW: 'DRAW',
 };
 
 /**
@@ -91,9 +94,16 @@ const estimatePlay = (matrix, iInt, jInt, color) => {
 		};
 	}
 
+	const finalResults = [];
+	for (var i = 0; i < results.length; i++) {
+		if (!finalResults.some((r) => r[0] === results[i][0] && r[1] === results[i][1])) {
+			finalResults.push(results[i]);
+		}
+	}
+
 	return {
 		status: STATUS.OK,
-		results,
+		results: finalResults,
 	};
 };
 

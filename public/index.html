@@ -42,7 +42,7 @@
         position: relative;
       }
       .piece {
-        cursor: hand;
+        cursor: pointer;
         display: block;
         border-radius: 50%;
         width: 50px;
@@ -54,18 +54,80 @@
         transition: background-color 0.5s, border 0.5s;
         transform: translate3d(-50%, -50%, 0);
         border: 1px solid transparent;
+        font-size: 1.4rem;
+        font-weight: bold;
+        line-height: 50px;
+        text-align: center;
       }
       .piece-white {
         background: white;
+        color: black;
       }
       .piece-black {
         background: black;
+        color: white;
       }
       .piece-border-black {
         border: 1px solid rgb(0, 0, 0, 0.4);
       }
       .piece-border-white {
         border: 1px solid rgb(255, 255, 255, 0.4);
+      }
+
+      .score {
+        width: 60px;
+        height: 60px;
+        position: relative;
+      }
+
+      .btn {
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        border: 1px solid gray;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .btn-restart {
+        background: red;
+        color: white;
+        border: 1px solid gray;
+      }
+      .btn-white {
+        background: white;
+        color: black;
+        border: 1px solid gray;
+      }
+      .btn-black {
+        background: black;
+        color: white;
+        border: 1px solid gray;
+      }
+
+      .btn:disabled {
+        background: white;
+        color: black;
+        border: 1px solid gray;
+        opacity: 0.2;
+        cursor: not-allowed;
+      }
+
+      #statusbar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        width: 400px;
+        margin: 20px auto;
+        padding: 10px;
+        border-radius: 20px;
+      }
+      .title {
+        font-size: 1.4rem;
+        padding: 0 20px;
+        font-weight: bold;
       }
 
     </style>
@@ -97,7 +159,7 @@
         document.getElementById('log').scrollTo(0,document.getElementById('log').scrollHeight);
       }
       // reloadTable
-      function reloadTable({ matrix, uri, next, status, playablePlaces }) {
+      function reloadTable({ matrix, uri, next, status, playablePlaces, counter, pass }) {
         addAction({
           status,
           uri,
@@ -143,16 +205,28 @@
           }
         }
 
-        document.getElementById('nb-playable').innerHTML = playablePlaces.length;
+        document.getElementById('btn-pass').innerHTML = `${playablePlaces.length} plays`;
+        document.getElementById('counter-black').innerHTML = counter.black;
+        document.getElementById('counter-white').innerHTML = counter.white;
+        document.getElementById('btn-pass').classList.remove(`btn-black`);
+        document.getElementById('btn-pass').classList.remove(`btn-white`);
+        document.getElementById('btn-pass').classList.add(`btn-${next}`);
+        document.getElementById('btn-pass').setAttribute('disabled', playablePlaces.length === 0);
         TABLE_LOADED = true;
         CURRENT_PLAYER = next;
       }
     </script>
   </head>
   <body>
-    <button onClick="start()">Start</button>
-    <button onClick="pass()">Pass</button>
-    <span>Playable places : <span id="nb-playable"></span></span>
+    <div id="statusbar">
+      <div class="actions">
+        <button onClick="start()" class="btn btn-restart">Restart</button>
+        <button onClick="pass()" id="btn-pass" class="btn btn-pass">Pass</button>
+      </div>
+      <div class="title">Bot Othello</div>
+      <div class="score"><span id="counter-white" class="piece piece-white piece-border-black"></span></div>
+      <div class="score"><span id="counter-black" class="piece piece-black piece-border-black"></span></div>
+    </div>
     <div id="container">
       <div id="gameboard"></div>
       <div id="log"></div>
