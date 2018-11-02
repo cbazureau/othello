@@ -67,28 +67,28 @@
       // Start
       function start() {
         document.getElementById('log').innerHTML = "";
-        fetch('/start');
+        fetch('/restart');
       }
 
       // Add action in log Panel
-      function addAction({ errorName, uri }) {
+      function addAction({ status, uri }) {
         const div = document.createElement('div');
-        if(errorName === 'OK') {
+        if(status === 'OK') {
           div.innerHTML = `${uri}`;
           div.className = 'success';
         } else {
-          div.innerHTML = `${uri} - ${errorName}`;
+          div.innerHTML = `${uri} - ${status}`;
           div.className = 'error';
         }
         document.getElementById('log').appendChild(div);
         document.getElementById('log').scrollTo(0,document.getElementById('log').scrollHeight);
       }
       // reloadTable
-      function reloadTable({ matrix, uri, next }) {
-        if(uri) addAction({
-          errorName: 'OK',
+      function reloadTable({ matrix, uri, next, status }) {
+        addAction({
+          status,
           uri,
-        })
+        });
         if(!TABLE_LOADED) {
           document.getElementById('gameboard').innerHTML = "";
           const table = document.createElement('table');
@@ -116,8 +116,9 @@
             var elem = document.getElementsByClassName(`pos-${i}-${j}`)[0];
             elem.setAttribute('url', `./play/${next}/${i}/${j}`);
             if(!elem.classList.contains(`piece-${matrix[i][j]}`)) {
-              if(matrix[i][j] === 'white' || matrix[i][j] === 'green') elem.classList.remove(`piece-black`);
-              if(matrix[i][j] === 'black' || matrix[i][j] === 'green') elem.classList.remove(`piece-white`);
+              elem.classList.remove(`piece-black`);
+              elem.classList.remove(`piece-white`);
+              elem.classList.remove(`piece-green`);
               if(matrix[i][j] !== 'green') elem.classList.add(`piece-${matrix[i][j]}`)
             }
           }
@@ -136,7 +137,6 @@
     <script>
       const socket = io('http://localhost:3005')
       socket.on('refresh', reloadTable)
-      socket.on('error', addAction)
       socket.emit('change color', 'red')
     </script>
   </body>
