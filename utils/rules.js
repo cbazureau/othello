@@ -10,6 +10,7 @@ const STATUS = {
 	NOT_YOUR_TURN: 'NOT_YOUR_TURN',
 	NOT_STARTED: 'NOT_STARTED',
 	MISSING_PARAMS: 'MISSING_PARAMS',
+	YOU_CANNOT_PASS: 'YOU_CANNOT_PASS',
 };
 
 /**
@@ -96,12 +97,29 @@ const estimatePlay = (matrix, iInt, jInt, color) => {
 	};
 };
 
+/**
+ * playablePlaces
+ * @param {*} matrix
+ * @param {*} color
+ */
+const playablePlaces = (matrix, color) => {
+	const results = [];
+	for (var i = 0; i < MATRIX_HEIGHT; i++) {
+		for (var j = 0; j < MATRIX_WIDTH; j++) {
+			const { status } = estimatePlay(matrix, i, j, color);
+			if (status === STATUS.OK) results.push([ i, j ]);
+		}
+	}
+	return results;
+};
+
 module.exports = {
 	DEFAULT_COLOR,
 	COLOR_LIST,
 	STATUS,
 	MATRIX_WIDTH,
 	MATRIX_HEIGHT,
+	playablePlaces,
 	checkDirection,
 	getOppositeColor,
 	estimatePlay,

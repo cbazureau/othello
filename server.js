@@ -4,6 +4,7 @@ const socketIO = require('socket.io');
 const {
 	estimatePlay,
 	getOppositeColor,
+	playablePlaces,
 	STATUS,
 	COLOR_LIST,
 	DEFAULT_COLOR,
@@ -38,14 +39,37 @@ const initGame = () => {
  * emitRefresh
  * @param {*} req
  * @param {*} res
+ * @param {*} status
  */
-const emitRefresh = (req, res, errorName) => {
+const emitRefresh = (req, res, status) => {
 	const uri = req ? req.url : '';
-	const status = errorName ? errorName : 'OK';
 	const next = NEXT_PLAYER;
-	const result = { matrix, uri, status, next };
+	const result = {
+		matrix,
+		uri,
+		status: status || STATUS.OK,
+		next,
+		playablePlaces: playablePlaces(matrix, next),
+	};
 	io.sockets.emit('refresh', result);
 	if (res && req) res.send(result);
+};
+
+/**
+ *
+ * @param {*} color
+ */
+const pass = ({ req, res, color }) => {
+	if (NEXT_PLAYER !== color) {
+		emitRefresh(req, res, STATUS.NOT_YOUR_TURN);
+		return;
+	}
+	if (playablePlaces(matrix, NEXT_PLAYER).length > 0) {
+		emitRefresh(req, res, STATUS.YOU_CANNOT_PASS);
+		return;
+	}
+	NEXT_PLAYER = getOppositeColor(color);
+	emitRefresh(req, res, STATUS.OK);
 };
 
 /**
@@ -101,6 +125,15 @@ app.get('/status', (req, res) => {
 	});
 });
 
+app.get('/pass/:color', (req, res) => {
+	const { color } = req.params;
+	if (color === undefined) {
+		emitRefresh(req, res, STATUS.MISSING_PARAMS);
+		return;
+	}
+	pass({ req, res, color });
+});
+
 app.get('/restart', (req, res) => {
 	initGame();
 	emitRefresh(req, res);
@@ -123,6 +156,7 @@ io.on('connection', (socket) => {
 	console.log('[socket] user connected');
 	emitRefresh();
 	socket.on('play', ({ i, j, color }) => play({ i, j, color }));
+	socket.on('pass', ({ color }) => pass({ color }));
 	socket.on('disconnect', () => console.log('[socket] user disconnected'));
 });
 server.listen(port, () => console.log(`Listening on port ${port}`));
