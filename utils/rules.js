@@ -46,7 +46,7 @@ const checkDirection = (matrix, iTest, jTest, iVector, jVector, color) => {
 		return [];
 	}
 	flippableCases.push([ iStart, jStart ]);
-	while (i < MATRIX_HEIGHT && i > 0 && j < MATRIX_WIDTH && j > 0) {
+	while (i < MATRIX_HEIGHT && i >= 0 && j < MATRIX_WIDTH && j >= 0) {
 		if (matrix[i][j] === DEFAULT_COLOR) {
 			return [];
 		}
