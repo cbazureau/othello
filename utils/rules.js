@@ -39,7 +39,7 @@ const checkDirection = (matrix, iTest, jTest, iVector, jVector, color) => {
 	let j = jStart;
 	if (
 		!matrix[iStart] ||
-		!matrix[iStart][jStart] ||
+		matrix[iStart][jStart] === undefined ||
 		matrix[iStart][jStart] === DEFAULT_COLOR ||
 		matrix[iStart][jStart] === color
 	) {
