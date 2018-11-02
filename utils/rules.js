@@ -10,16 +10,16 @@ const STATUS = {
   NOT_YOUR_TURN: 'NOT_YOUR_TURN',
   NOT_STARTED: 'NOT_STARTED',
   MISSING_PARAMS: 'MISSING_PARAMS',
-}
+};
 
 /**
  * getOppositeColor
  * @param {*} color
  */
-const getOppositeColor = (color) => {
+const getOppositeColor = color => {
   const nextIndex = (COLOR_LIST.indexOf(color) + 1) % COLOR_LIST.length;
   return COLOR_LIST[nextIndex];
-}
+};
 
 /**
  * checkDirection
@@ -32,22 +32,24 @@ const getOppositeColor = (color) => {
  */
 const checkDirection = (matrix, iTest, jTest, iVector, jVector, color) => {
   const flippableCases = [];
-  const iStart = (iTest + iVector);
-  const jStart = (jTest + jVector);
+  const iStart = iTest + iVector;
+  const jStart = jTest + jVector;
   let i = iStart;
   let j = jStart;
-  if(!matrix[iStart]
-    || !matrix[iStart][jStart]
-    || matrix[iStart][jStart] === DEFAULT_COLOR
-    || matrix[iStart][jStart] === color) {
+  if (
+    !matrix[iStart] ||
+    !matrix[iStart][jStart] ||
+    matrix[iStart][jStart] === DEFAULT_COLOR ||
+    matrix[iStart][jStart] === color
+  ) {
     return [];
   }
   flippableCases.push([iStart, jStart]);
-  while(i < MATRIX_HEIGHT && i > 0 && j < MATRIX_WIDTH && j > 0) {
-    if(matrix[i][j] === DEFAULT_COLOR) {
+  while (i < MATRIX_HEIGHT && i > 0 && j < MATRIX_WIDTH && j > 0) {
+    if (matrix[i][j] === DEFAULT_COLOR) {
       return [];
     }
-    if(matrix[i][j] === color) {
+    if (matrix[i][j] === color) {
       return flippableCases;
     }
     flippableCases.push([i, j]);
@@ -55,7 +57,7 @@ const checkDirection = (matrix, iTest, jTest, iVector, jVector, color) => {
     j = j + jVector;
   }
   return [];
-}
+};
 
 /**
  * estimatePlay
@@ -65,10 +67,10 @@ const checkDirection = (matrix, iTest, jTest, iVector, jVector, color) => {
  * @param {*} color
  */
 const estimatePlay = (matrix, iInt, jInt, color) => {
-  if(matrix[iInt][jInt] !== DEFAULT_COLOR) {
+  if (matrix[iInt][jInt] !== DEFAULT_COLOR) {
     return {
       status: STATUS.ANOTHER_PLAYER_HERE,
-    }
+    };
   }
   const results = [
     ...checkDirection(matrix, iInt, jInt, -1, -1, color),
@@ -82,17 +84,17 @@ const estimatePlay = (matrix, iInt, jInt, color) => {
     ...checkDirection(matrix, iInt, jInt, 1, 1, color),
   ];
 
-  if(results.length === 0) {
+  if (results.length === 0) {
     return {
       status: STATUS.IMPOSSIBLE_PLAY,
-    }
+    };
   }
 
   return {
     status: STATUS.OK,
     results,
-  }
-}
+  };
+};
 
 module.exports = {
   DEFAULT_COLOR,
@@ -102,5 +104,5 @@ module.exports = {
   MATRIX_HEIGHT,
   checkDirection,
   getOppositeColor,
-  estimatePlay
-}
+  estimatePlay,
+};
