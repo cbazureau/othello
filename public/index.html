@@ -65,6 +65,24 @@
         background: #FFF8DC;
         color: #1F1209;
       }
+      .piece::before {
+        border-radius: 50%;
+        width: 43px;
+        height: 43px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate3d(-50%, -50%, 0);
+        background: transparent;
+      }
+      .piece-white::before {
+        content:'';
+        border: 1px solid rgb(0, 0, 0, 0.3);
+      }
+      .piece-black::before {
+        content:'';
+        border: 1px solid rgb(255, 255, 255, 0.3);
+      }
       .piece-black {
         background: #1F1209;
         color: #FFF8DC;
@@ -220,13 +238,18 @@
           }
         }
 
-        document.getElementById('btn-pass').innerHTML = `${playablePlaces.length} plays`;
         document.getElementById('counter-black').innerHTML = counter.black;
         document.getElementById('counter-white').innerHTML = counter.white;
         document.getElementById('btn-pass').classList.remove(`btn-black`);
         document.getElementById('btn-pass').classList.remove(`btn-white`);
         document.getElementById('btn-pass').classList.add(`btn-${next}`);
-        document.getElementById('btn-pass').setAttribute('disabled', playablePlaces.length === 0);
+        document.getElementById('btn-pass').removeAttribute('disabled')
+        if(playablePlaces.length !== 0) {
+          document.getElementById('btn-pass').setAttribute('disabled', 'disabled');
+          document.getElementById('btn-pass').innerHTML = `${playablePlaces.length} plays`;
+        } else {
+          document.getElementById('btn-pass').innerHTML = `Pass turn`;
+        }
         TABLE_LOADED = true;
         CURRENT_PLAYER = next;
       }
