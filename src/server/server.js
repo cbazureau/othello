@@ -10,7 +10,7 @@ const {
 	DEFAULT_COLOR,
 	MATRIX_WIDTH,
 	MATRIX_HEIGHT,
-} = require('./utils/rules');
+} = require('../utils/rules');
 
 let matrix = [];
 let STARTED = false;
@@ -140,7 +140,7 @@ const play = ({ req, res, i, j, color }) => {
 // our localhost port
 const port = 3005;
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 app.get('/status', (req, res) => {
 	res.send({
