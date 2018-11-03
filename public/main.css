@@ -1,0 +1,162 @@
+body {
+	background: #003366;
+	font-size: 10px;
+}
+#container {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	margin: 20px 0;
+}
+#log {
+	width: 280px;
+	height: 470px;
+	overflow-y: scroll;
+	background: white;
+	padding: 10px;
+	margin-left: 20px;
+	border: 10px solid #834c24;
+	font-size: 0.9rem;
+	border-radius: 5px;
+}
+#log .success {
+	color: green;
+}
+#log .error {
+	color: red;
+}
+#gameboard table {
+	table-layout: fixed;
+	border: 10px solid #834c24;
+	border-spacing: 1px;
+	background: #074f3b;
+	border-radius: 5px;
+}
+#gameboard table td {
+	width: 60px;
+	height: 60px;
+	padding: 0;
+	margin: 0;
+	background: #097054;
+	position: relative;
+}
+.piece {
+	cursor: pointer;
+	display: block;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background: transparent;
+	transition: background-color 0.5s, border 0.5s;
+	transform: translate3d(-50%, -50%, 0);
+	border: 1px solid transparent;
+	font-size: 1.4rem;
+	font-weight: bold;
+	line-height: 50px;
+	text-align: center;
+}
+.piece-white {
+	background: #fff8dc;
+	color: #1f1209;
+}
+.piece::before {
+	border-radius: 50%;
+	width: 43px;
+	height: 43px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate3d(-50%, -50%, 0);
+	background: transparent;
+}
+.piece-white::before {
+	content: '';
+	border: 1px solid rgb(0, 0, 0, 0.3);
+}
+.piece-black::before {
+	content: '';
+	border: 1px solid rgb(255, 255, 255, 0.3);
+}
+.piece-black {
+	background: #1f1209;
+	color: #fff8dc;
+}
+.piece-border-black {
+	border: 1px solid rgb(0, 0, 0, 0.4);
+}
+.piece-border-white {
+	border: 1px solid rgb(255, 255, 255, 0.4);
+}
+
+.score {
+	width: 60px;
+	height: 60px;
+	position: relative;
+}
+
+.btn {
+	border-radius: 5px;
+	width: 60px;
+	height: 60px;
+	border: 1px solid gray;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.btn-restart {
+	background: red;
+	color: #fff8dc;
+	border: 1px solid gray;
+}
+.btn-white {
+	background: #fff8dc;
+	color: #1f1209;
+	border: 1px solid gray;
+}
+.btn-black {
+	background: #1f1209;
+	color: #fff8dc;
+	border: 1px solid gray;
+}
+
+.btn:disabled {
+	background: #fff8dc;
+	color: #1f1209;
+	border: 1px solid gray;
+	opacity: 0.2;
+	cursor: not-allowed;
+}
+
+#statusbar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	background: #fff8dc;
+	max-width: 830px;
+	margin: 20px auto;
+	padding: 10px;
+	border-radius: 5px;
+}
+.actions {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 130px;
+	justify-content: space-between;
+}
+.title {
+	font-size: 1.4rem;
+	padding: 0 20px;
+	font-weight: bold;
+}
+.scores {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 120px;
+	justify-content: space-between;
+}
