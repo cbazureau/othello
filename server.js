@@ -43,23 +43,25 @@ const initGame = () => {
  * emitRefresh
  * @param {*} req
  * @param {*} res
+ * @param {*} currentPlay
  * @param {*} status
  */
-const emitRefresh = (req, res, status) => {
+const emitRefresh = (req, res, currentPlay, status) => {
 	const uri = req ? req.url : '';
 	const next = NEXT_PLAYER;
 
 	const total = COUNTER.black + COUNTER.white;
 	if (PASS === 2 || total === 64) {
-		if (COUNTER.black > COUNTER.white) status = STATUS.BLACK_VICTORY;
-		if (COUNTER.white > COUNTER.black) status = STATUS.WHITE_VICTORY;
-		if (COUNTER.white === COUNTER.black) status = STATUS.DRAW;
+		if (COUNTER.black > COUNTER.white) status = STATUS.END_BLACK_VICTORY;
+		if (COUNTER.white > COUNTER.black) status = STATUS.END_WHITE_VICTORY;
+		if (COUNTER.white === COUNTER.black) status = STATUS.END_DRAW;
 	}
 	const result = {
 		matrix,
 		uri,
 		status: status || STATUS.OK,
 		next,
+		play: currentPlay,
 		playablePlaces: playablePlaces(matrix, next),
 		counter: COUNTER,
 		pass: PASS,
@@ -74,16 +76,16 @@ const emitRefresh = (req, res, status) => {
  */
 const pass = ({ req, res, color }) => {
 	if (NEXT_PLAYER !== color) {
-		emitRefresh(req, res, STATUS.NOT_YOUR_TURN);
+		emitRefresh(req, res, { color }, STATUS.NOT_YOUR_TURN);
 		return;
 	}
 	if (playablePlaces(matrix, NEXT_PLAYER).length > 0) {
-		emitRefresh(req, res, STATUS.YOU_CANNOT_PASS);
+		emitRefresh(req, res, { color }, STATUS.YOU_CANNOT_PASS);
 		return;
 	}
 	PASS++;
 	NEXT_PLAYER = getOppositeColor(color);
-	emitRefresh(req, res, STATUS.OK);
+	emitRefresh(req, res, { color }, STATUS.OK);
 };
 
 /**
@@ -96,27 +98,32 @@ const pass = ({ req, res, color }) => {
  */
 const play = ({ req, res, i, j, color }) => {
 	if (!STARTED) {
-		emitRefresh(req, res, STATUS.NOT_STARTED);
+		emitRefresh(req, res, undefined, STATUS.NOT_STARTED);
 		return;
 	}
 
 	if (i === undefined || j === undefined || color === undefined) {
-		emitRefresh(req, res, STATUS.MISSING_PARAMS);
+		emitRefresh(req, res, undefined, STATUS.MISSING_PARAMS);
 		return;
 	}
 
 	const iInt = parseInt(i, 10);
 	const jInt = parseInt(j, 10);
+	const currentPlay = {
+		i: iInt,
+		j: jInt,
+		color,
+	};
 
 	if (NEXT_PLAYER !== color) {
-		emitRefresh(req, res, STATUS.NOT_YOUR_TURN);
+		emitRefresh(req, res, currentPlay, STATUS.NOT_YOUR_TURN);
 		return;
 	}
 
 	const estimation = estimatePlay(matrix, iInt, jInt, color);
 
 	if (estimation.status !== STATUS.OK) {
-		emitRefresh(req, res, estimation.status);
+		emitRefresh(req, res, currentPlay, estimation.status);
 		return;
 	}
 
@@ -127,7 +134,7 @@ const play = ({ req, res, i, j, color }) => {
 	COUNTER[NEXT_PLAYER] = COUNTER[NEXT_PLAYER] - estimation.results.length;
 	PASS = 0;
 
-	emitRefresh(req, res, STATUS.OK);
+	emitRefresh(req, res, currentPlay, STATUS.OK);
 };
 
 // our localhost port
@@ -145,7 +152,7 @@ app.get('/status', (req, res) => {
 app.get('/pass/:color', (req, res) => {
 	const { color } = req.params;
 	if (color === undefined) {
-		emitRefresh(req, res, STATUS.MISSING_PARAMS);
+		emitRefresh(req, res, undefined, STATUS.MISSING_PARAMS);
 		return;
 	}
 	pass({ req, res, color });

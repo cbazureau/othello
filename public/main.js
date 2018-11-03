@@ -12,23 +12,24 @@ function pass() {
 }
 
 // Add action in log Panel
-function addAction({ status, uri }) {
+function addAction({ status, play }) {
 	const div = document.createElement('div');
-	if (status === 'OK') {
-		div.innerHTML = `${uri}`;
-		div.className = 'success';
-	} else {
-		div.innerHTML = `${uri} - ${status}`;
-		div.className = 'error';
+	let message = '';
+	if (play && play.i !== undefined) {
+		message = `<span class="log-play log-play-${play.color}">i${play.i} / j${play.j}</span>`;
+	} else if (play && play.color) {
+		message = `<span class="log-play log-play-${play.color}">NO PLAY</span>`;
 	}
+	div.innerHTML = `${message}<span class="log-play">${status}</span>`;
+	div.className = 'log-entry';
 	document.getElementById('log').appendChild(div);
 	document.getElementById('log').scrollTo(0, document.getElementById('log').scrollHeight);
 }
 // reloadTable
-function reloadTable({ matrix, uri, next, status, playablePlaces, counter, pass }) {
+function reloadTable({ matrix, uri, next, status, playablePlaces, counter, pass, play }) {
 	addAction({
 		status,
-		uri,
+		play,
 	});
 	if (!TABLE_LOADED) {
 		document.getElementById('gameboard').innerHTML = '';

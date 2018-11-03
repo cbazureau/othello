@@ -11,9 +11,9 @@ const STATUS = {
 	NOT_STARTED: 'NOT_STARTED',
 	MISSING_PARAMS: 'MISSING_PARAMS',
 	YOU_CANNOT_PASS: 'YOU_CANNOT_PASS',
-	WHITE_VICTORY: 'WHITE_VICTORY',
-	BLACK_VICTORY: 'BLACK_VICTORY',
-	DRAW: 'DRAW',
+	END_WHITE_VICTORY: 'END_WHITE_VICTORY',
+	END_BLACK_VICTORY: 'END_BLACK_VICTORY',
+	END_DRAW: 'END_DRAW',
 };
 
 /**
@@ -113,14 +113,14 @@ const estimatePlay = (matrix, iInt, jInt, color) => {
  * @param {*} color
  */
 const playablePlaces = (matrix, color) => {
-	const results = [];
+	const pp = [];
 	for (var i = 0; i < MATRIX_HEIGHT; i++) {
 		for (var j = 0; j < MATRIX_WIDTH; j++) {
-			const { status } = estimatePlay(matrix, i, j, color);
-			if (status === STATUS.OK) results.push([ i, j ]);
+			const { status, results } = estimatePlay(matrix, i, j, color);
+			if (status === STATUS.OK) pp.push([ i, j, results ]);
 		}
 	}
-	return results;
+	return pp;
 };
 
 module.exports = {
