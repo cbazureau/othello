@@ -20,7 +20,7 @@ body {
 	border-radius: 5px;
 }
 #log .log-entry {
-	height: 27px;
+	height: 26px;
 }
 
 #log .log-play {
@@ -156,7 +156,7 @@ body {
 	align-items: center;
 	justify-content: space-between;
 	background: #fff8dc;
-	max-width: 750px;
+	max-width: 740px;
 	margin: 20px auto;
 	padding: 10px;
 	border-radius: 5px;
