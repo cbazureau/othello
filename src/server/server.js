@@ -177,10 +177,10 @@ initGame();
 // This creates our socket using the instance of the server
 const io = socketIO(server);
 io.on('connection', (socket) => {
-	console.log('[socket] user connected');
+	console.log('[SERVER] user connected');
 	emitRefresh();
 	socket.on('play', ({ i, j, color }) => play({ i, j, color }));
 	socket.on('pass', ({ color }) => pass({ color }));
-	socket.on('disconnect', () => console.log('[socket] user disconnected'));
+	socket.on('disconnect', () => console.log('[SERVER] user disconnected'));
 });
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(port, () => console.log(`[SERVER] Listening on port ${port}`));
