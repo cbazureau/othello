@@ -83,6 +83,23 @@ function reloadTable({ matrix, uri, next, status, playablePlaces, counter, pass,
 	} else {
 		document.getElementById('btn-pass').innerHTML = `Pass turn`;
 	}
+	if (status.indexOf('END_') > -1) {
+		document.getElementsByClassName('title-default')[0].style.display = 'none';
+		document.getElementsByClassName('title-win')[0].style.display = 'flex';
+		if (status === 'END_WHITE_VICTORY') {
+			document.getElementById('win-text').innerHTML = 'WHITE wins';
+		}
+		if (status === 'END_BLACK_VICTORY') {
+			document.getElementById('win-text').innerHTML = 'BLACK wins';
+		}
+		if (status === 'END_DRAW') {
+			document.getElementById('win-text').innerHTML = 'DRAW';
+		}
+	} else {
+		document.getElementsByClassName('title-default')[0].style.display = 'flex';
+		document.getElementsByClassName('title-win')[0].style.display = 'none';
+	}
+
 	TABLE_LOADED = true;
 	CURRENT_PLAYER = next;
 }

@@ -13,7 +13,7 @@ body {
 	height: 470px;
 	overflow-y: scroll;
 	background: white;
-	padding: 10px;
+	padding: 10px 5px;
 	margin-left: 20px;
 	border: 10px solid #834c24;
 	font-size: 0.9rem;
@@ -26,6 +26,7 @@ body {
 #log .log-play {
 	padding: 2px 4px;
 	border-radius: 2px;
+	font-size: 0.7rem;
 }
 #log .log-play-white {
 	background: #fff8dc;
@@ -51,6 +52,7 @@ body {
 	margin: 0;
 	background: #097054;
 	position: relative;
+	border-radius: 2px;
 }
 .piece {
 	cursor: pointer;
@@ -107,6 +109,12 @@ body {
 	width: 60px;
 	height: 60px;
 	position: relative;
+}
+
+.title-win {
+	align-items: center;
+	justify-content: space-between;
+	display: none;
 }
 
 .btn {
