@@ -14,5 +14,7 @@ then go to http://localhost:3005
 ## Add a black bot
 
 ```
-npm bot:tars black
+npm run bot:tars black
 ```
+
+![game capture](capture.gif)
